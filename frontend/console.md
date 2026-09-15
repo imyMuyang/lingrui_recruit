@@ -34,4 +34,4 @@ Token 为 `NM2QuDsDuBmna*****************（打码）`
 }
 ```
 
-[Github Repo](https://github.com/imyMuyang/lingrui_recruit/frontend/)
+[Github Repo](https://github.com/imyMuyang/lingrui_recruit/blob/main/frontend/console.md)
