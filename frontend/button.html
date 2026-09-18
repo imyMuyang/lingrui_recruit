@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>凌睿前端招新 - 按钮</title>
+    <style>
+      * {
+        transition: all 0.3s ease; 
+      }
+      #container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 25vh;
+        height: 50vh;
+        margin-left: 25vw;
+        margin-right: 25vw;
+        background-color: antiquewhite;
+        border-radius: 0.1in;
+      }
+      #outer {
+        display: flex;
+        box-shadow: 3px 3px 2px 1px #ffbe4d;
+        border-radius: 15px;
+        height: 10vh;
+        width: 10vh;
+        background: linear-gradient(90deg, #ffbe4d 0%, #fbda7e 100%);
+      }
+      #inner {
+        align-items: center;
+        justify-content: center;
+        display: flex;
+        height: 100%;
+        width: 100%;
+      }
+      #inner svg {
+        width: 70%; 
+        height: 70%;
+        align-self: center;
+        max-width: 100%;
+        max-height: 100%;
+      }
+      #outer:hover #inner svg {
+        transform: scale(1.2); 
+      }
+      #outer:hover {
+        filter: brightness(1.05);
+      }
+      #outer:active{
+        transform: scale(0.8);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <div id="button">
+        <div id="outer">
+          <div id="inner">
+            <svg
+              t="1789714302815"
+              class="icon"
+              viewBox="0 0 1024 1024"
+              version="1.1"
+              xmlns="http://www.w3.org/2000/svg"
+              p-id="5031"
+              width="200"
+              height="200"
+            >
+              <path
+                d="M377.9 114.1h358.3l-136.4 268 231.5 0.3-485.1 559.3 139.5-356.4H222.6z"
+                fill="#FFFFFF"
+                p-id="5032"
+              ></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
