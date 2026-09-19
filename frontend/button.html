@@ -17,7 +17,7 @@
         background-color: antiquewhite;
         border-radius: 0.1in;
       }
-      #outer {
+      .outer {
         display: flex;
         box-shadow: 3px 3px 2px 1px #ffbe4d;
         border-radius: 15px;
@@ -25,36 +25,35 @@
         width: 10vh;
         background: linear-gradient(90deg, #ffbe4d 0%, #fbda7e 100%);
       }
-      #inner {
-        align-items: center;
+      .inner {
         justify-content: center;
         display: flex;
         height: 100%;
         width: 100%;
       }
-      #inner svg {
+      .inner svg {
         width: 70%; 
         height: 70%;
         align-self: center;
         max-width: 100%;
         max-height: 100%;
       }
-      #outer:hover #inner svg {
+      .outer:hover .inner svg {
         transform: scale(1.2); 
       }
-      #outer:hover {
+      .outer:hover {
         filter: brightness(1.05);
       }
-      #outer:active{
+      .outer:active{
         transform: scale(0.8);
       }
     </style>
   </head>
   <body>
     <div id="container">
-      <div id="button">
-        <div id="outer">
-          <div id="inner">
+      <div class="button">
+        <div class="outer">
+          <div class="inner">
             <svg
               t="1789714302815"
               class="icon"
