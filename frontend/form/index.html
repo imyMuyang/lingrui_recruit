@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>凌睿前端招新 - 表单</title>
+    <link rel="stylesheet" href="./style.css" />
+    <script src="https://code.jquery.com/jquery-4.0.0.min.js"></script>
+    <script src="./check.js"></script>
+  </head>
+  <body>
+    <div id="container">
+      <h1>注册 HanYe OJ</h1>
+      <p id="hint">火速提交信息，然后开始交题 8-3</p>
+      <form id="form">
+        <div class="group">
+          <label for="name">姓名</label>
+          <div class="description">应该怎么称呼你比较好呢……</div>
+          <input id="name" type="text" placeholder="请输入姓名" />
+          <div class="err" id="nameerr">
+            名字只填了一片空白，实在不知道该怎么称呼你呢……
+          </div>
+        </div>
+        <div class="group">
+          <label for="path">方向</label>
+          <div class="description">前端 / 后端 / 设计，或者全栈大佬（？</div>
+          <select name="path" id="path">
+            <option value="" disabled selected hidden>请选择</option>
+            <option value="f">前端</option>
+            <option value="b">后端</option>
+            <option value="d">设计</option>
+          </select>
+          <div class="err" id="patherr">还没选择方向，莫非是全栈大佬……</div>
+        </div>
+        <div class="group">
+          <label for="intro">自我介绍</label>
+          <div id="textdata" class="description">当前已写 0 字</div>
+          <textarea
+            name="intro"
+            id="intro"
+            placeholder="可以简要介绍一下自己，字数限制在 100 字以内。"
+          ></textarea>
+          <div class="err" id="introerr1">填点东西吧 QAQ</div>
+          <div class="err" id="introerr2">字太多啦，稍微减少一下下呢？</div>
+        </div>
+        <div class="group">
+          <input
+            type="checkbox"
+            name="agree"
+            id="agree"
+          />我同意 <a href="https://www.bilibili.com/video/BV1GJ411x7h7/">HanYe OJ 报名须知</a>
+          <div class="err" id="agreeerr">请先点击确认我们的报名须知哦！</div>
+        </div>
+        <div class="group">
+          <button type="submit">提交</button>
+          <button type="reset">重置</button>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>
