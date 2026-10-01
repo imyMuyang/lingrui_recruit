@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>凌睿前端招新 - 暗黑模式</title>
+    <script>
+      ;(function () {
+        const saved = localStorage.getItem('theme')
+        const system = matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'dark'
+          : 'light'
+        const theme = saved ?? system
+        document.documentElement.dataset.theme = theme
+        document.documentElement.style.colorScheme = theme
+      })()
+    </script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      /*指定允许使用神色和浅色模式*/
+      * {
+        transition: all 0.4s ease;
+      }
+      html[data-theme='dark'] .dark {
+        display: block;
+      }
+      html[data-theme='dark'] .light {
+        display: none;
+      }
+      html[data-theme='light'] .dark {
+        display: none;
+      }
+      html[data-theme='light'] .light {
+        display: block;
+      }
+      :root {
+        color-scheme: light dark;
+        --colorbg: light-dark(#ffffff, #797d7f);
+        --colortext: light-dark(#2c3e50, #f4f6f7);
+        --colorbuttonbg: light-dark(#a9cce3, #1f618d);
+        --colorcardbg: light-dark(#fbfcfc, #212f3c);
+      }
+      :root[data-theme='light'] {
+        color-scheme: light;
+      }
+      :root[data-theme='dark'] {
+        color-scheme: dark;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: var(--colorbg);
+        color: var(--colortext);
+        min-height: 100vh;
+        background-image: light-dark(
+            linear-gradient(rgba(170, 170, 170, 0.4), rgba(170, 170, 170, 0.4)),
+            linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4))
+          ),
+          light-dark(
+            url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80'),
+            url('https://images.unsplash.com/photo-1613753598214-119055b017f7?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')
+          );
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+      }
+
+      /* 导航栏 */
+      nav {
+        background: light-dark(rgba(255, 255, 255, 0.95), #2e4053);
+        padding: 1rem 0;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 2px 10px light-dark(rgba(0, 0, 0, 0.1), #2e4053);
+      }
+
+      .nav-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        font-size: 1.8rem;
+        font-weight: bold;
+        background: linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 2rem;
+      }
+
+      .nav-links a {
+        color: var(--colortext);
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      /* 主题切换器 */
+      .theme-switcher {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 30px;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: 0.4s;
+        border-radius: 30px;
+      }
+
+      .slider:before {
+        position: absolute;
+        content: '';
+        height: 22px;
+        width: 22px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+      }
+
+      input:checked + .slider {
+        background: #3498db;
+      }
+
+      input:checked + .slider:before {
+        transform: translateX(30px);
+      }
+
+      /* 英雄区域 */
+      .hero {
+        text-align: center;
+        padding: 4rem 0;
+        margin-bottom: 2rem;
+      }
+
+      .hero h1 {
+        font-size: 3.5rem;
+        margin-bottom: 1rem;
+        background: light-dark(
+          linear-gradient(90deg, #3f5efb, #fc466b),
+          linear-gradient(90deg, #8fd2ff, #ffa48d)
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .hero p {
+        color: var(--colortext);
+        font-size: 1.2rem;
+        max-width: 700px;
+        margin: 0 auto 2rem;
+        opacity: 0.9;
+      }
+
+      .cta-button {
+        background: var(--colorbuttonbg);
+        color: var(--colortext);
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      /* 内容区域 */
+      .content {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+        margin-bottom: 3rem;
+      }
+
+      /* 卡片样式 */
+      .card {
+        background: var(--colorcardbg);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+        border: 1px solid var(--colorbg);
+      }
+
+      .card h2 {
+        color: #3498db;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #3498db;
+      }
+
+      /* 轮播图 */
+      .carousel {
+        position: relative;
+        height: 400px;
+        overflow: hidden;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      .carousel-inner {
+        display: flex;
+        transition: transform 0.5s ease;
+        height: 100%;
+      }
+
+      .carousel-item {
+        min-width: 100%;
+        height: 100%;
+        position: relative;
+      }
+
+      .carousel-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .carousel-caption {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: color-mix(in srgb, var(--colorcardbg) 85%, transparent);
+        padding: 1.5rem;
+      }
+
+      .carousel-controls {
+        position: absolute;
+        bottom: 1rem;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        z-index: 10;
+      }
+
+      .carousel-control {
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        opacity: 0.7;
+      }
+
+      .carousel-control.active {
+        opacity: 1;
+        transform: scale(1.2);
+        background: #3498db;
+      }
+
+      /* 特性网格 */
+      .features {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .feature {
+        background: var(--colorcardbg);
+        border-radius: 15px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 5px 15px var(--colorbg);
+        border: 1px solid #e0e0e0;
+      }
+
+      .feature i {
+        font-size: 2.5rem;
+        color: #3498db;
+        margin-bottom: 1rem;
+      }
+
+      /* 侧边栏 */
+      .sidebar {
+        position: sticky;
+        top: 6rem;
+      }
+
+      .widget {
+        background: var(--colorcardbg);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e0e0e0;
+      }
+
+      .widget h3 {
+        color: #3498db;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
+      input[type='email'] {
+        background-color: var(--colorbg);
+        border: 1px solid var(--colorcardbg);
+        color: var(--colortext);
+      }
+
+      input[type='email']::placeholder {
+        color: light-dark(#d0d3d4, #d0d3d4);
+      }
+
+      /* 页脚 */
+      footer {
+        background: var(--colorcardbg);
+        padding: 2rem 0;
+        text-align: center;
+        margin-top: 3rem;
+        border-top: 1px solid var(--colorbg);
+      }
+
+      .social-links {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .social-links a {
+        color: var(--colortext);
+        font-size: 1.5rem;
+      }
+
+      /* 响应式设计 */
+      @media (max-width: 900px) {
+        .content {
+          grid-template-columns: 1fr;
+        }
+
+        .features {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 600px) {
+        .features {
+          grid-template-columns: 1fr;
+        }
+
+        .hero h1 {
+          font-size: 2.5rem;
+        }
+
+        .nav-container {
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .nav-links {
+          gap: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 导航栏 -->
+    <nav>
+      <div class="container nav-container">
+        <div class="logo">环球旅行日记</div>
+        <div class="nav-links">
+          <a href="#">首页</a>
+          <a href="#">目的地</a>
+          <a href="#">游记</a>
+          <a href="#">攻略</a>
+          <a href="#">关于我们</a>
+        </div>
+        <div class="theme-switcher">
+          <span>☀️</span>
+          <label class="switch">
+            <input type="checkbox" id="theme-toggle" />
+            <span id="slider" class="slider"></span>
+          </label>
+          <span>🌙</span>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      <!-- 英雄区域 -->
+      <section class="hero">
+        <h1>探索世界的奇妙之处</h1>
+        <p>从极光之地到热带雨林，记录每一次旅行的精彩瞬间，分享你的旅行故事</p>
+        <button class="cta-button">开始探索</button>
+      </section>
+
+      <!-- 轮播图 -->
+      <div class="card">
+        <h2>热门目的地</h2>
+        <div class="carousel">
+          <div class="carousel-inner">
+            <div class="carousel-item">
+              <img
+                src="https://images.unsplash.com/photo-1544085311-11a028465b03?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                alt="Nature"
+                class="carousel-image light"
+              />
+              <img
+                src="https://images.unsplash.com/photo-1632514452727-2c189858eb1a?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                class="carousel-image dark"
+                alt=""
+              />
+              <div class="carousel-caption">
+                <h3>挪威峡湾</h3>
+                <p>北欧最壮丽的自然景观之一</p>
+              </div>
+            </div>
+            <div class="carousel-item">
+              <img
+                src="https://images.unsplash.com/photo-1521292270410-a8c4d716d518?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                alt="Mountain"
+                class="carousel-image light"
+              />
+              <img
+                class="carousel-image dark"
+                src="https://images.unsplash.com/photo-1514969655361-1dbc3731d4cc?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                alt=""
+              />
+              <div class="carousel-caption">
+                <h3>阿尔卑斯山</h3>
+                <p>欧洲最著名的山脉，滑雪爱好者的天堂</p>
+              </div>
+            </div>
+            <div class="carousel-item">
+              <img
+                src="https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                alt="Beach"
+                class="carousel-image light"
+              />
+              <img
+                src="https://images.unsplash.com/photo-1544473243-618f55d06792?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                class="dark carousel-image"
+                alt=""
+              />
+              <div class="carousel-caption">
+                <h3>马尔代夫</h3>
+                <p>印度洋上的珍珠，蜜月旅行首选地</p>
+              </div>
+            </div>
+          </div>
+          <div class="carousel-controls">
+            <button class="carousel-control active"></button>
+            <button class="carousel-control"></button>
+            <button class="carousel-control"></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 主要内容区域 -->
+      <div class="content">
+        <div class="main-content">
+          <!-- 特性网格 -->
+          <div class="features">
+            <div class="feature">
+              <i class="fas fa-map-marked-alt"></i>
+              <h3>500+ 目的地</h3>
+              <p>全球热门旅行地点一网打尽</p>
+            </div>
+            <div class="feature">
+              <i class="fas fa-users"></i>
+              <h3>10万+ 旅行者</h3>
+              <p>加入我们的旅行者社区</p>
+            </div>
+            <div class="feature">
+              <i class="fas fa-star"></i>
+              <h3>4.8 评分</h3>
+              <p>用户对我们的服务评价</p>
+            </div>
+          </div>
+
+          <!-- 最新游记 -->
+          <div class="card">
+            <h2>最新游记</h2>
+            <p>
+              探索我们社区的最新旅行故事和经验分享。从独自背包客到家庭旅行，从预算旅行到豪华度假，这里有无穷的灵感和实用建议。
+            </p>
+            <p>
+              无论你是计划下一次冒险还是只是想梦想遥远的地方，我们的旅行者社区都有适合每个人的内容。
+            </p>
+          </div>
+
+          <!-- 旅行统计 -->
+          <div class="card">
+            <h2>旅行统计</h2>
+            <p>
+              2023年，我们的社区成员已经访问了97个国家，分享了超过5,000篇游记，并上传了超过2万张照片。
+            </p>
+            <p>
+              最受欢迎的目的地是日本、意大利和泰国，而最常被讨论的主题是美食之旅、户外冒险和文化体验。
+            </p>
+          </div>
+        </div>
+
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+          <div class="widget">
+            <h3>订阅更新</h3>
+            <p>输入您的电子邮件地址，获取最新旅行提示和目的地推荐。</p>
+            <input
+              type="email"
+              placeholder="您的邮箱"
+              style="
+                width: 100%;
+                padding: 0.8rem;
+                margin: 0.5rem 0;
+                border-radius: 5px;
+              "
+            />
+            <button class="cta-button" style="width: 100%">订阅</button>
+          </div>
+
+          <div class="widget">
+            <h3>热门标签</h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem">
+              <span
+                style="
+                  background: #3498db;
+                  color: white;
+                  padding: 0.3rem 0.8rem;
+                  border-radius: 20px;
+                  font-size: 0.9rem;
+                "
+                >#背包客</span
+              >
+              <span
+                style="
+                  background: #3498db;
+                  color: white;
+                  padding: 0.3rem 0.8rem;
+                  border-radius: 20px;
+                  font-size: 0.9rem;
+                "
+                >#美食之旅</span
+              >
+              <span
+                style="
+                  background: #3498db;
+                  color: white;
+                  padding: 0.3rem 0.8rem;
+                  border-radius: 20px;
+                  font-size: 0.9rem;
+                "
+                >#家庭旅行</span
+              >
+              <span
+                style="
+                  background: #3498db;
+                  color: white;
+                  padding: 0.3rem 0.8rem;
+                  border-radius: 20px;
+                  font-size: 0.9rem;
+                "
+                >#冒险</span
+              >
+              <span
+                style="
+                  background: #3498db;
+                  color: white;
+                  padding: 0.3rem 0.8rem;
+                  border-radius: 20px;
+                  font-size: 0.9rem;
+                "
+                >#预算旅行</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer>
+      <div class="container">
+        <div class="social-links">
+          <a href="#"><i class="fab fa-facebook"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-pinterest"></i></a>
+          <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+        <p>&copy; 2023 环球旅行日记. 所有权利保留.</p>
+      </div>
+    </footer>
+
+    <script>
+      // 轮播图功能
+      const carouselInner = document.querySelector('.carousel-inner')
+      const carouselItems = document.querySelectorAll('.carousel-item')
+      const carouselControls = document.querySelectorAll('.carousel-control')
+      let currentIndex = 0
+
+      function updateCarousel() {
+        carouselInner.style.transform = `translateX(-${currentIndex * 100}%)`
+
+        // 更新控制按钮状态
+        carouselControls.forEach((control, index) => {
+          if (index === currentIndex) {
+            control.classList.add('active')
+          } else {
+            control.classList.remove('active')
+          }
+        })
+      }
+
+      // 为控制按钮添加点击事件
+      carouselControls.forEach((control, index) => {
+        control.addEventListener('click', () => {
+          currentIndex = index
+          updateCarousel()
+        })
+      })
+
+      // 自动轮播
+      setInterval(() => {
+        currentIndex = (currentIndex + 1) % carouselItems.length
+        updateCarousel()
+      }, 5000)
+
+      // 主题切换功能
+      const toggle = document.getElementById('theme-toggle')
+      toggle.checked = document.documentElement.dataset.theme === 'dark'
+      toggle.addEventListener('change', () => {
+        const theme = toggle.checked ? 'dark' : 'light'
+        document.documentElement.style.colorScheme = theme
+        document.documentElement.dataset.theme = theme
+        localStorage.setItem('theme', theme)
+      })
+    </script>
+  </body>
+</html>
