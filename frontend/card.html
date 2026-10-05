@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>凌睿前端招新 - 卡片</title>
+    <style>
+      * {
+        transition: 0.3s ease;
+      }
+      #container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 10vh;
+        height: 80vh;
+        margin-left: 10vw;
+        margin-right: 10vw;
+        background-color: antiquewhite;
+        border-radius: 0.1in;
+      }
+
+      .parent {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        height: 95%;
+        width: 95%;
+        gap: 26px;
+      }
+
+      .child {
+        position: relative;
+        overflow: hidden;
+        border-radius: 5px;
+        box-shadow: 2px 2px 2px 1px #ffbe4d;
+        background: #fff;
+      }
+      img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .child:hover img {
+        transform: scale(1.06);
+      }
+      .mask {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 50px;
+        max-height: 50px;
+        z-index: 1;
+        padding: 12px 16px;
+        color: #fff;
+        background: rgba(0, 0, 0, 0.38);
+        overflow: hidden;
+      }
+      .child.active .mask {
+        height: 90%;
+        background: rgba(0, 0, 0, 0.7);
+        max-height: 100%;
+      }
+      .child.active .mdesc {
+        opacity: 1;
+      }
+      .mtitle {
+        font-size: 20px;
+        font-weight: 700;
+        overflow: hidden;
+      }
+      .mdesc {
+        font-size: 12px;
+        line-height: 1.5;
+        opacity: 0;
+        /* max-height: 0; */
+        overflow: hidden;
+        transition: opacity 0.4s ease, max-height 0.4s ease;
+      }
+      @media (max-width: 640px) {
+        #container {
+          margin: 5vh 4vw 0;
+          height: auto;
+          padding: 16px;
+        }
+        .parent {
+          grid-template-columns: 1fr;
+          grid-template-rows: repeat(4, 200px);
+          height: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <div class="parent">
+        <div class="div1 child">
+          <img
+            src="https://cn.bing.com/th?id=OHR.AdelieTeacher_ZH-CN2201820679_UHD.jpg"
+            alt=""
+          />
+          <div class="mask">
+            <div class="mtitle">纵身一跃，一次一课</div>
+            <div class="mdesc">
+              南极洲的阿德利企鹅 (© Otto Plantema/Minden Pictures) - 2026/10/05
+              一只身高28英寸的鸟能教给我们哪些人生道理？非常多。阿德利企鹅带来了一份充满足智多谋、坚韧不拔和些许顽皮的课程计划。
+            </div>
+          </div>
+        </div>
+        <div class="div2 child">
+          <img
+            src="https://cn.bing.com/th?id=OHR.ArtemisRocket_ZH-CN1768541365_UHD.jpg"
+            alt=""
+          />
+          <div class="mask">
+            <div class="mtitle">宇宙在召唤</div>
+            <div class="mdesc">
+              阿尔忒弥斯1号月球火箭，39B发射台，肯尼迪航天中心，佛罗里达州，2022年6月15日
+              (© EVA MARIE UZCATEGUI/Getty Images) - 2026/10/04
+              首先，你要造一枚火箭。然后，你要让它离开地球，飞往月球，在旅途中安然无恙，并将其航天器带回家。
+            </div>
+          </div>
+        </div>
+        <div class="div3 child">
+          <img
+            src="https://cn.bing.com/th?id=OHR.GrizzlySwim_ZH-CN1005455737_UHD.jpg"
+            alt=""
+          />
+          <div class="mask">
+            <div class="mtitle">捕捉、进食、重复</div>
+            <div class="mdesc">
+              美国阿拉斯加州克拉克湖国家公园和自然保护区银鲑溪中的棕熊 (© Danny
+              Green/Nature Picture Library) - 2026/10/03
+              大快朵颐、肚皮更鼓并为冬季囤积能量的时节到了。在阿拉斯加州，克拉克湖国家公园和自然保护区的棕熊充分利用10月仍可获取的食物。
+            </div>
+          </div>
+        </div>
+        <div class="div4 child">
+          <img
+            src="https://cn.bing.com/th?id=OHR.ChattoogaRiver_ZH-CN9453791496_UHD.jpg"
+            alt=""
+          />
+          <div class="mask">
+            <div class="mtitle">一条值得保护的河流</div>
+            <div class="mdesc">
+              查图加河，阿巴拉契亚山脉，北卡罗来纳州，美国 (© mtilghma/Getty
+              Images) - 2026/10/02
+              长期以来，河流在美国各地的生活中发挥着重要作用，为社区、野生动物和工业提供支持。1968年10月2日，林登·B·约翰逊总统签署《野生与风景河流法》，使其成为法律。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      document.querySelectorAll('.child').forEach(card => {
+        card.addEventListener('click', () => {
+          card.classList.toggle('active')
+        })
+      })
+    </script>
+  </body>
+</html>
