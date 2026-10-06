@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>标题 —— 页面标题</title>
+  <style>
+    /* ---------- 基础重置 ---------- */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+      line-height: 1.6;
+      color: #222;
+      background: #f7f7f8;
+    }
+
+    a { color: #0b5fff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .container {
+      width: min(1100px, 92%);
+      margin-inline: auto;
+    }
+
+    /* ---------- Nav ---------- */
+    .site-header {
+      background: #fff;
+      border-bottom: 1px solid #e5e5e8;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 14px 0;
+    }
+
+    .nav__logo {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: #111;
+    }
+
+    .nav__list {
+      display: flex;
+      gap: 20px;
+      list-style: none;
+    }
+
+    .nav__list > li { position: relative; }
+
+    .nav__list a {
+      display: block;
+      padding: 4px 2px;
+      font-size: 0.95rem;
+    }
+
+    /* 二级导航（层级链接） */
+    .nav__sub {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      min-width: 160px;
+      padding: 8px 0;
+      list-style: none;
+      background: #fff;
+      border: 1px solid #e5e5e8;
+      border-radius: 8px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, .08);
+      display: none;
+    }
+
+    .nav__sub li a { padding: 6px 14px; font-size: 0.875rem; }
+
+    .nav__list > li:hover .nav__sub,
+    .nav__list > li:focus-within .nav__sub { display: block; }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      padding: 72px 0;
+      background: #fff;
+      border-bottom: 1px solid #e5e5e8;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      line-height: 1.25;
+      margin-bottom: 16px;
+    }
+
+    .hero p {
+      max-width: 640px;
+      margin: 0 auto 28px;
+      color: #555;
+    }
+
+    .hero__actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 22px;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      border: 1px solid transparent;
+    }
+
+    .btn--primary { background: #0b5fff; color: #fff; }
+    .btn--primary:hover { background: #0a4fd8; text-decoration: none; }
+
+    .btn--ghost { border-color: #d0d0d6; color: #222; background: #fff; }
+    .btn--ghost:hover { background: #f0f0f4; text-decoration: none; }
+
+    /* ---------- Cards ---------- */
+    .section { padding: 64px 0; }
+
+    .section > .container > h2 {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+
+    .section__lead {
+      color: #666;
+      margin-bottom: 32px;
+      font-size: 0.95rem;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 24px;
+      background: #fff;
+      border: 1px solid #e5e5e8;
+      border-radius: 12px;
+    }
+
+    .card h3 { font-size: 1.1rem; }
+
+    .card p {
+      font-size: 0.925rem;
+      color: #555;
+      flex-grow: 1;
+    }
+
+    .card a { font-size: 0.9rem; }
+
+    /* ---------- Footer ---------- */
+    .site-footer {
+      padding: 48px 0 24px;
+      background: #17171a;
+      color: #b9b9c0;
+      font-size: 0.9rem;
+    }
+
+    .site-footer a { color: #d7d7de; }
+
+    .footer__cols {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 32px;
+      margin-bottom: 32px;
+    }
+
+    .footer__cols h2 {
+      font-size: 0.8rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #8c8c96;
+      margin-bottom: 12px;
+    }
+
+    .footer__cols ul { list-style: none; }
+
+    .footer__cols li { margin-bottom: 8px; }
+
+    .footer__bottom {
+      padding-top: 20px;
+      border-top: 1px solid #2c2c31;
+      font-size: 0.825rem;
+      color: #8c8c96;
+    }
+
+    /* ============================================================
+       自定义光标
+       ============================================================ */
+
+    /* 1. 隐藏原生光标：只在“精确指针 + 支持 hover”的设备上生效。
+          .has-custom-cursor 由 JS 添加，JS 挂了就自动退回原生光标。 */
+    @media (hover: hover) and (pointer: fine) {
+      html.has-custom-cursor,
+      html.has-custom-cursor *,
+      html.has-custom-cursor *::before,
+      html.has-custom-cursor *::after {
+        cursor: none !important;
+      }
+    }
+
+    /* 2. 光标容器：只负责整体显隐，不参与布局 */
+    .cursor {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .25s ease;
+    }
+
+    .cursor.is-active { opacity: 1; }
+
+    /* 3. 圆点 + 圆环的公共部分
+          --x / --y 由 JS 每帧写入，用独立的 translate 属性定位，
+          好处是 translate 与 scale 互不干扰：
+          - translate 由 rAF 缓动，不加 transition
+          - scale 由 CSS transition 接管，负责状态切换的动画 */
+    .cursor__dot,
+    .cursor__ring {
+      position: fixed;
+      top: 0;
+      left: 0;
+      border-radius: 50%;
+      pointer-events: none;
+      translate: var(--x, -100px) var(--y, -100px);
+      will-change: transform;
+    }
+
+    /* 4. 圆点：永远贴着真实鼠标位置 */
+    .cursor__dot {
+      width: 6px;
+      height: 6px;
+      margin: -3px 0 0 -3px;      /* 让元素中心对齐坐标点 */
+      background: #111;
+      scale: 1;
+      transition: scale .2s ease;
+    }
+
+    /* 5. 圆环：靠 JS 缓动追着圆点跑 */
+    .cursor__ring {
+      width: 36px;
+      height: 36px;
+      margin: -18px 0 0 -18px;
+      border: 1.5px solid rgba(17, 17, 17, .5);
+      background-color: rgba(17, 17, 17, 0);
+      scale: 1;
+      transition:
+        scale .3s cubic-bezier(.22, 1, .36, 1),
+        background-color .3s ease,
+        border-color .3s ease;
+    }
+
+    /* 6. 悬停在可交互元素上：环放大、变淡，像“吸”上去 */
+    .cursor.is-hover .cursor__ring {
+      scale: 1.7;
+      background-color: rgba(17, 17, 17, .07);
+      border-color: rgba(17, 17, 17, .22);
+    }
+
+    /* 7. 按下：环和点都收缩，制造“跟手”的压感 */
+    .cursor.is-down .cursor__ring { scale: .7; }
+    .cursor.is-down .cursor__dot  { scale: .5; }
+
+    /* 8. 悬停中按下：环不要缩到最小，保留放大的底子，避免跳动感 */
+    .cursor.is-hover.is-down .cursor__ring { scale: 1.15; }
+    .cursor.is-hover.is-down .cursor__dot  { scale: .55; }
+  </style>
+</head>
+<body>
+
+  <!-- ========== 自定义光标 ========== -->
+  <div class="cursor" id="cursor" aria-hidden="true">
+    <div class="cursor__dot"></div>
+    <div class="cursor__ring"></div>
+  </div>
+
+  <!-- ========== Nav ========== -->
+  <header class="site-header">
+    <nav class="nav container" aria-label="主导航">
+      <a class="nav__logo" href="#">标题</a>
+
+      <ul class="nav__list">
+        <li><a href="#">链接一</a></li>
+        <li>
+          <a href="#">链接二</a>
+          <ul class="nav__sub">
+            <li><a href="#">子链接一</a></li>
+            <li><a href="#">子链接二</a></li>
+            <li><a href="#">子链接三</a></li>
+          </ul>
+        </li>
+        <li><a href="#">链接三</a></li>
+        <li><a href="#">链接四</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- ========== Hero ========== -->
+    <section class="hero">
+      <div class="container">
+        <h1>标题：这是一个主标题</h1>
+        <p>
+          文本（乱数假文）：Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+          sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        </p>
+        <div class="hero__actions">
+          <a class="btn btn--primary" href="#">主要链接</a>
+          <a class="btn btn--ghost" href="#">次要链接</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== Cards ========== -->
+    <section class="section">
+      <div class="container">
+        <h2>标题：区块标题</h2>
+        <p class="section__lead">文本（乱数假文）：Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+
+        <div class="cards">
+
+          <article class="card">
+            <h3>标题：卡片标题一</h3>
+            <p>文本（乱数假文）：Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.</p>
+            <a href="#">链接：了解更多</a>
+          </article>
+
+          <article class="card">
+            <h3>标题：卡片标题二</h3>
+            <p>文本（乱数假文）：Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.</p>
+            <a href="#">链接：了解更多</a>
+          </article>
+
+          <article class="card">
+            <h3>标题：卡片标题三</h3>
+            <p>文本（乱数假文）：Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium.</p>
+            <a href="#">链接：了解更多</a>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========== Footer ========== -->
+  <footer class="site-footer">
+    <div class="container">
+
+      <div class="footer__cols">
+
+        <div>
+          <h2>标题：分组一</h2>
+          <ul>
+            <li><a href="#">链接一</a></li>
+            <li><a href="#">链接二</a></li>
+            <li><a href="#">链接三</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h2>标题：分组二</h2>
+          <ul>
+            <li><a href="#">链接四</a></li>
+            <li><a href="#">链接五</a></li>
+            <li><a href="#">链接六</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h2>标题：分组三</h2>
+          <ul>
+            <li><a href="#">链接七</a></li>
+            <li><a href="#">链接八</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <p class="footer__bottom">文本（乱数假文）：© 2025 标题 —— 保留所有权利。</p>
+
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const cursor = document.getElementById('cursor');
+      if (!cursor) return;
+
+      const dot  = cursor.querySelector('.cursor__dot');
+      const ring = cursor.querySelector('.cursor__ring');
+      const root = document.documentElement;
+
+      /* 命中这些元素时，环进入 hover 放大态 */
+      const INTERACTIVE = [
+        'a[href]',
+        'button',
+        'input',
+        'textarea',
+        'select',
+        'summary',
+        'label',
+        '[role="button"]',
+        '[role="link"]',
+        '[contenteditable="true"]',
+        '[tabindex]:not([tabindex="-1"])'
+      ].join(',');
+
+      const FINE_POINTER = window.matchMedia('(hover: hover) and (pointer: fine)');
+
+      /* 环的跟随系数：0~1，越小越“钝”、拖尾越明显 */
+      const RING_EASE = 0.15;
+
+      let targetX = -100, targetY = -100;  // 鼠标真实坐标
+      let ringX   = -100, ringY   = -100;  // 环当前坐标
+      let active  = false;                 // 指针是否在页面内
+      let rafId   = 0;
+
+      /* ---------- 工具 ---------- */
+      function setVar(el, x, y) {
+        el.style.setProperty('--x', x.toFixed(2) + 'px');
+        el.style.setProperty('--y', y.toFixed(2) + 'px');
+      }
+
+      /* ---------- 主循环：只做环的线性插值 ---------- */
+      function tick() {
+        ringX += (targetX - ringX) * RING_EASE;
+        ringY += (targetY - ringY) * RING_EASE;
+        setVar(ring, ringX, ringY);
+        rafId = requestAnimationFrame(tick);
+      }
+
+      /* ---------- 事件处理 ---------- */
+      function onPointerMove(e) {
+        if (e.pointerType === 'touch') return;
+
+        targetX = e.clientX;
+        targetY = e.clientY;
+
+        // 圆点直接贴着真实光标，无延迟
+        setVar(dot, targetX, targetY);
+
+        // 首次出现：环直接落位，避免从屏幕角落“飞”过来
+        if (!active) {
+          active = true;
+          ringX = targetX;
+          ringY = targetY;
+          setVar(ring, ringX, ringY);
+          cursor.classList.add('is-active');
+        }
+
+        // hover 状态：命中可交互元素就放大
+        const hit = e.target && e.target.closest ? e.target.closest(INTERACTIVE) : null;
+        cursor.classList.toggle('is-hover', !!hit);
+      }
+
+      function onPointerDown(e) {
+        if (e.pointerType === 'touch') return;
+        cursor.classList.add('is-down');
+      }
+
+      function onPointerUp() {
+        cursor.classList.remove('is-down');
+      }
+
+      function onPointerOut(e) {
+        // relatedTarget 为 null → 指针离开了整个文档
+        if (e.relatedTarget) return;
+        active = false;
+        cursor.classList.remove('is-active', 'is-hover', 'is-down');
+      }
+
+      /* ---------- 开关 ---------- */
+      function enable() {
+        root.classList.add('has-custom-cursor');
+        window.addEventListener('pointermove', onPointerMove, { passive: true });
+        window.addEventListener('pointerdown', onPointerDown, { passive: true });
+        window.addEventListener('pointerup', onPointerUp);
+        window.addEventListener('pointercancel', onPointerUp);
+        window.addEventListener('blur', onPointerUp);
+        document.addEventListener('pointerout', onPointerOut);
+        if (!rafId) rafId = requestAnimationFrame(tick);
+      }
+
+      function disable() {
+        root.classList.remove('has-custom-cursor');
+        cursor.classList.remove('is-active', 'is-hover', 'is-down');
+        window.removeEventListener('pointermove', onPointerMove);
+        window.removeEventListener('pointerdown', onPointerDown);
+        window.removeEventListener('pointerup', onPointerUp);
+        window.removeEventListener('pointercancel', onPointerUp);
+        window.removeEventListener('blur', onPointerUp);
+        document.removeEventListener('pointerout', onPointerOut);
+        if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+        active = false;
+      }
+
+      /* ---------- 启动 ---------- */
+      if (FINE_POINTER.matches) enable();
+
+      // 中途插拔鼠标 / 切换输入方式时同步开关
+      const onMqChange = (e) => (e.matches ? enable() : disable());
+      if (FINE_POINTER.addEventListener) {
+        FINE_POINTER.addEventListener('change', onMqChange);
+      } else if (FINE_POINTER.addListener) {
+        FINE_POINTER.addListener(onMqChange);   // 兼容老 Safari
+      }
+    })();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>凌睿前端招新 - 光标</title>
+    <style>
+      * {
+        cursor: none !important;
+      }
+      .cursor-dot,
+      .cursor-ring {
+        opacity: 0;
+        position: fixed;
+        border-radius: 50%;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        will-change: transform;
+        transition: width 0.28s cubic-bezier(0.2, 0.8, 0.2, 1),
+          height 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.28s ease,
+          border 0.28s ease, opacity 0.3s ease;
+      }
+      .cursor-dot {
+        z-index: 9999;
+        width: 8px;
+        height: 8px;
+        background: #0b5fff;
+      }
+      .cursor-ring {
+        z-index: 9998;
+        width: 32px;
+        height: 32px;
+        border: 2px dashed #92b4ff;
+      }
+      .cursor-dot.hover {
+        width: 6px;
+        height: 6px;
+      }
+      .cursor-ring.hover {
+        width: 64px;
+        height: 64px;
+        border: 2px solid #7ba5ff;
+        background: rgba(111, 148, 250, 0.1);
+      }
+      .cursor-dot.click {
+        width: 10px;
+        height: 10px;
+      }
+      .cursor-ring.click {
+        width: 24px;
+        height: 24px;
+        background: rgba(111, 148, 250, 0.3);
+      }
+
+      /*以下内容由 Deepseek 生成*/
+      /* #region ds */
+      /* ---------- 基础重置 ---------- */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: system-ui, -apple-system, 'Segoe UI', 'Microsoft YaHei',
+          sans-serif;
+        line-height: 1.6;
+        color: #222;
+        background: #f7f7f8;
+      }
+
+      a {
+        color: #0b5fff;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+
+      .container {
+        width: min(1100px, 92%);
+        margin-inline: auto;
+      }
+
+      /* ---------- Nav ---------- */
+      .site-header {
+        background: #fff;
+        border-bottom: 1px solid #e5e5e8;
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        padding: 14px 0;
+      }
+
+      .nav__logo {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #111;
+      }
+
+      .nav__list {
+        display: flex;
+        gap: 20px;
+        list-style: none;
+      }
+
+      .nav__list > li {
+        position: relative;
+      }
+
+      .nav__list a {
+        display: block;
+        padding: 4px 2px;
+        font-size: 0.95rem;
+      }
+
+      /* 二级导航（层级链接） */
+      .nav__sub {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        min-width: 160px;
+        padding: 8px 0;
+        list-style: none;
+        background: #fff;
+        border: 1px solid #e5e5e8;
+        border-radius: 8px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+        display: none;
+      }
+
+      .nav__sub li a {
+        padding: 6px 14px;
+        font-size: 0.875rem;
+      }
+
+      .nav__list > li:hover .nav__sub,
+      .nav__list > li:focus-within .nav__sub {
+        display: block;
+      }
+
+      /* ---------- Hero ---------- */
+      .hero {
+        padding: 72px 0;
+        background: #fff;
+        border-bottom: 1px solid #e5e5e8;
+        text-align: center;
+      }
+
+      .hero h1 {
+        font-size: clamp(1.75rem, 4vw, 2.5rem);
+        line-height: 1.25;
+        margin-bottom: 16px;
+      }
+
+      .hero p {
+        max-width: 640px;
+        margin: 0 auto 28px;
+        color: #555;
+      }
+
+      .hero__actions {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 10px 22px;
+        border-radius: 999px;
+        font-size: 0.95rem;
+        border: 1px solid transparent;
+      }
+
+      .btn--primary {
+        background: #0b5fff;
+        color: #fff;
+      }
+      .btn--primary:hover {
+        background: #0a4fd8;
+        text-decoration: none;
+      }
+
+      .btn--ghost {
+        border-color: #d0d0d6;
+        color: #222;
+        background: #fff;
+      }
+      .btn--ghost:hover {
+        background: #f0f0f4;
+        text-decoration: none;
+      }
+
+      /* ---------- Cards ---------- */
+      .section {
+        padding: 64px 0;
+      }
+
+      .section > .container > h2 {
+        font-size: 1.5rem;
+        margin-bottom: 8px;
+      }
+
+      .section__lead {
+        color: #666;
+        margin-bottom: 32px;
+        font-size: 0.95rem;
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 20px;
+      }
+
+      .card {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 24px;
+        background: #fff;
+        border: 1px solid #e5e5e8;
+        border-radius: 12px;
+      }
+
+      .card h3 {
+        font-size: 1.1rem;
+      }
+
+      .card p {
+        font-size: 0.925rem;
+        color: #555;
+        flex-grow: 1;
+      }
+
+      .card a {
+        font-size: 0.9rem;
+      }
+
+      /* ---------- Footer ---------- */
+      .site-footer {
+        padding: 48px 0 24px;
+        background: #17171a;
+        color: #b9b9c0;
+        font-size: 0.9rem;
+      }
+
+      .site-footer a {
+        color: #d7d7de;
+      }
+
+      .footer__cols {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 32px;
+        margin-bottom: 32px;
+      }
+
+      .footer__cols h2 {
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #8c8c96;
+        margin-bottom: 12px;
+      }
+
+      .footer__cols ul {
+        list-style: none;
+      }
+
+      .footer__cols li {
+        margin-bottom: 8px;
+      }
+
+      .footer__bottom {
+        padding-top: 20px;
+        border-top: 1px solid #2c2c31;
+        font-size: 0.825rem;
+        color: #8c8c96;
+      }
+      /* #endregion */
+    </style>
+  </head>
+  <body>
+    <!-- ========== Nav ========== -->
+    <header class="site-header">
+      <nav class="nav container" aria-label="主导航">
+        <a class="nav__logo" href="#">标题</a>
+
+        <ul class="nav__list">
+          <li><a href="#">链接一</a></li>
+          <li>
+            <a href="#">链接二</a>
+            <ul class="nav__sub">
+              <li><a href="#">子链接一</a></li>
+              <li><a href="#">子链接二</a></li>
+              <li><a href="#">子链接三</a></li>
+            </ul>
+          </li>
+          <li><a href="#">链接三</a></li>
+          <li><a href="#">链接四</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <!-- ========== Hero ========== -->
+      <section class="hero">
+        <div class="container">
+          <h1>标题：这是一个主标题</h1>
+          <p>
+            文本（乱数假文）：Lorem ipsum dolor sit amet, consectetur adipiscing
+            elit, sed do eiusmod tempor incididunt ut labore et dolore magna
+            aliqua.
+          </p>
+          <div class="hero__actions">
+            <a class="btn btn--primary" href="#">主要链接</a>
+            <a class="btn btn--ghost" href="#">次要链接</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== Cards ========== -->
+      <section class="section">
+        <div class="container">
+          <h2>标题：区块标题</h2>
+          <p class="section__lead">
+            文本（乱数假文）：Ut enim ad minim veniam, quis nostrud exercitation
+            ullamco laboris.
+          </p>
+
+          <div class="cards">
+            <article class="card">
+              <h3>标题：卡片标题一</h3>
+              <p>
+                文本（乱数假文）：Duis aute irure dolor in reprehenderit in
+                voluptate velit esse cillum dolore.
+              </p>
+              <a href="#">链接：了解更多</a>
+            </article>
+
+            <article class="card">
+              <h3>标题：卡片标题二</h3>
+              <p>
+                文本（乱数假文）：Excepteur sint occaecat cupidatat non
+                proident, sunt in culpa qui officia.
+              </p>
+              <a href="#">链接：了解更多</a>
+            </article>
+
+            <article class="card">
+              <h3>标题：卡片标题三</h3>
+              <p>
+                文本（乱数假文）：Sed ut perspiciatis unde omnis iste natus
+                error sit voluptatem accusantium.
+              </p>
+              <a href="#">链接：了解更多</a>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ========== Footer ========== -->
+    <footer class="site-footer">
+      <div class="container">
+        <div class="footer__cols">
+          <div>
+            <h2>标题：分组一</h2>
+            <ul>
+              <li><a href="#">链接一</a></li>
+              <li><a href="#">链接二</a></li>
+              <li><a href="#">链接三</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h2>标题：分组二</h2>
+            <ul>
+              <li><a href="#">链接四</a></li>
+              <li><a href="#">链接五</a></li>
+              <li><a href="#">链接六</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h2>标题：分组三</h2>
+            <ul>
+              <li><a href="#">链接七</a></li>
+              <li><a href="#">链接八</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <p class="footer__bottom">
+          文本（乱数假文）：© 2025 标题 —— 保留所有权利。
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      // 初始化并创建光标
+      let dot = document.createElement('div')
+      dot.className = 'cursor-dot'
+      let ring = document.createElement('div')
+      ring.className = 'cursor-ring'
+      document.body.append(dot, ring)
+      let mx = innerWidth / 2
+      let my = innerHeight / 2
+      window.addEventListener('mousemove', e => {
+        // 在光标移动时显示光标，并记录光标位置
+        mx = e.clientX
+        my = e.clientY
+        dot.style.opacity = '1'
+        ring.style.opacity = '1'
+      })
+      let dx = mx,
+        dy = my
+      let rx = mx,
+        ry = my
+      // 处理光标位置更新
+      function render() {
+        dx += (mx - dx) * 0.35
+        dy += (my - dy) * 0.35
+        rx += (mx - rx) * 0.15
+        ry += (my - ry) * 0.15
+        dot.style.transform = `translate3d(${dx}px, ${dy}px, 0) translate(-50%, -50%)`
+        ring.style.transform = `translate3d(${rx}px, ${ry}px, 0) translate(-50%, -50%)`
+        requestAnimationFrame(render) // 在下一帧刷新的时候让浏览器调用 render
+      }
+      render()
+      // 处理光标滑动点击效果（类）
+      let hoverable = 'a, button, .card, input, textarea, select, .btn'
+      document.addEventListener('mouseover', e => {
+        if (e.target.closest(hoverable)) {
+          dot.classList.add('hover')
+          ring.classList.add('hover')
+        }
+      })
+      document.addEventListener('mouseout', e => {
+        if (!e.target.closest(hoverable)) {
+          return
+        }
+        if (
+          !(
+            (
+              e.relatedTarget && // 如果没有移入元素不执行
+              e.relatedTarget.closest && // 如果移入的元素没有 closest 不执行
+              e.relatedTarget.closest(hoverable)
+            ) // 如果移入的元素还在 hoverable 不执行
+          )
+        ) {
+          dot.classList.remove('hover')
+          ring.classList.remove('hover')
+        }
+      })
+      document.addEventListener('mousedown', e => {
+        dot.classList.add('click')
+        ring.classList.add('click')
+      })
+      document.addEventListener('mouseup', e => {
+        dot.classList.remove('click')
+        ring.classList.remove('click')
+      })
+      // 离开页面时让光标消失
+      document.addEventListener('mouseleave', e => {
+        dot.style.opacity = '0'
+        ring.style.opacity = '0'
+      })
+    </script>
+  </body>
+</html>
