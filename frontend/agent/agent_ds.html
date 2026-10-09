@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Agent Chat</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #111111;
+    --muted: #8a8a8a;
+    --line: #eaeaea;
+    --bubble: #f4f4f4;
+    --accent: #111111;
+    --ok: #2ea043;
+    --warn: #d29922;
+    --err: #e5484d;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f0f0f;
+      --fg: #ededed;
+      --muted: #8a8a8a;
+      --line: #262626;
+      --bubble: #1b1b1b;
+      --accent: #ededed;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { height: 100%; margin: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font: 14px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui,
+          "PingFang SC", "Microsoft YaHei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  #app {
+    height: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid var(--line);
+    border-right: 1px solid var(--line);
+  }
+
+  /* ---------- 顶栏 ---------- */
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    flex: 0 0 auto;
+  }
+  .bar .title { font-weight: 600; letter-spacing: .2px; }
+  .icon-btn {
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1;
+    padding: 6px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .icon-btn:hover { background: var(--bubble); color: var(--fg); }
+
+  /* ---------- 设置面板 ---------- */
+  .settings {
+    padding: 14px 16px 16px;
+    border-bottom: 1px solid var(--line);
+    display: grid;
+    gap: 10px;
+    flex: 0 0 auto;
+  }
+  .settings label {
+    display: grid;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .settings input {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 9px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--fg);
+    font: inherit;
+    font-size: 13px;
+    outline: none;
+  }
+  .settings input:focus { border-color: var(--muted); }
+  .settings-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 2px;
+  }
+  .settings-actions button {
+    border: 0;
+    border-radius: 9px;
+    padding: 7px 14px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    background: var(--accent);
+    color: var(--bg);
+  }
+  .settings-actions button.ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--line);
+  }
+  .hint { font-size: 12px; color: var(--muted); margin-left: auto; }
+
+  /* ---------- 消息流 ---------- */
+  .stream {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 18px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    scroll-behavior: smooth;
+  }
+  .stream:empty::before {
+    content: "开始对话，或调用 AgentChat.showMessage()";
+    margin: auto;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .msg {
+    max-width: 84%;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+  .msg.user {
+    align-self: flex-end;
+    background: var(--accent);
+    color: var(--bg);
+    padding: 8px 13px;
+    border-radius: 14px 14px 4px 14px;
+  }
+  .msg.agent {
+    align-self: flex-start;
+    background: var(--bubble);
+    padding: 8px 13px;
+    border-radius: 14px 14px 14px 4px;
+  }
+  .msg.pending { color: var(--muted); }
+  .msg.pending::after {
+    content: "···";
+    letter-spacing: 3px;
+    animation: blink 1.1s ease-in-out infinite;
+  }
+  @keyframes blink { 50% { opacity: .25; } }
+
+  /* ---------- 工具调用卡片 ---------- */
+  .tool {
+    align-self: stretch;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 9px 12px;
+    font-size: 13px;
+  }
+  .tool-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--muted);
+    flex: 0 0 auto;
+  }
+  .tool.running .dot { background: var(--warn); animation: pulse 1.1s ease-in-out infinite; }
+  .tool.done    .dot { background: var(--ok); }
+  .tool.error   .dot { background: var(--err); }
+  @keyframes pulse { 50% { opacity: .25; } }
+
+  .tool-name {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12.5px;
+  }
+  .tool-status {
+    margin-left: auto;
+    color: var(--muted);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .tool-body { margin-top: 9px; display: grid; gap: 8px; }
+  .tool-label {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 4px;
+    letter-spacing: .3px;
+    text-transform: uppercase;
+  }
+  .tool pre {
+    margin: 0;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: var(--bubble);
+    color: var(--fg);
+    font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 220px;
+    overflow: auto;
+  }
+
+  /* ---------- 输入区 ---------- */
+  .composer {
+    flex: 0 0 auto;
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+    padding: 12px 16px;
+    border-top: 1px solid var(--line);
+  }
+  .composer textarea {
+    flex: 1 1 auto;
+    resize: none;
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    padding: 9px 12px;
+    background: transparent;
+    color: var(--fg);
+    font: inherit;
+    outline: none;
+    max-height: 120px;
+    min-height: 38px;
+  }
+  .composer textarea:focus { border-color: var(--muted); }
+  .composer button {
+    border: 0;
+    background: var(--accent);
+    color: var(--bg);
+    padding: 9px 16px;
+    border-radius: 11px;
+    font: inherit;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .composer button:disabled { opacity: .35; cursor: default; }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <header class="bar">
+    <span class="title">Agent</span>
+    <button id="settingsBtn" class="icon-btn" title="设置" aria-label="设置">⚙</button>
+  </header>
+
+  <section id="settings" class="settings" hidden>
+    <label>API Base
+      <input id="apiBase" type="text" spellcheck="false" placeholder="https://api.openai.com/v1" />
+    </label>
+    <label>API Key
+      <input id="apiKey" type="password" spellcheck="false" placeholder="sk-..." />
+    </label>
+    <div class="settings-actions">
+      <button id="saveCfg" type="button">保存</button>
+      <button id="clearCfg" class="ghost" type="button">清除</button>
+      <span id="cfgStatus" class="hint"></span>
+    </div>
+  </section>
+
+  <main id="stream" class="stream"></main>
+
+  <form id="composer" class="composer">
+    <textarea id="input" rows="1" placeholder="发消息…（Enter 发送 / Shift+Enter 换行）"></textarea>
+    <button type="submit">发送</button>
+  </form>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* =========================================================
+   * 常量
+   * =======================================================*/
+  const STORAGE_KEY = 'agent-chat.config';
+  const MODEL = 'gpt-4o-mini'; // 默认请求模型，可自行修改
+
+  const $ = (sel) => document.querySelector(sel);
+  const stream = $('#stream');
+  const input = $('#input');
+  const composer = $('#composer');
+  const settingsPanel = $('#settings');
+  const apiBaseInput = $('#apiBase');
+  const apiKeyInput = $('#apiKey');
+  const cfgStatus = $('#cfgStatus');
+
+  /* =========================================================
+   * 1. 配置读写（localStorage）
+   * =======================================================*/
+  function readRawConfig() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') || {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function writeRawConfig(cfg) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(cfg));
+    } catch (e) {
+      /* 隐私模式等场景静默失败 */
+    }
+  }
+
+  /**
+   * 写入 API 配置。
+   * @param {{apiBase?: string, apiKey?: string}} patch
+   */
+  function setApiConfig(patch = {}) {
+    const cfg = readRawConfig();
+    if (patch.apiBase !== undefined) cfg.apiBase = String(patch.apiBase).trim();
+    if (patch.apiKey !== undefined) cfg.apiKey = String(patch.apiKey).trim();
+    writeRawConfig(cfg);
+
+    // 同步到设置面板
+    apiBaseInput.value = cfg.apiBase || '';
+    apiKeyInput.value = cfg.apiKey || '';
+
+    return getApiConfig();
+  }
+
+  /* =========================================================
+   * 2. 对外 API：getApiConfig()
+   * =======================================================*/
+  /**
+   * 获取当前 API 相关信息。
+   * @returns {{
+   *   apiBase: string,        // 已去掉末尾斜杠
+   *   apiKey: string,
+   *   model: string,
+   *   configured: boolean,    // base + key 是否都已填写
+   *   headers: Record<string,string>
+   * }}
+   */
+  function getApiConfig() {
+    const cfg = readRawConfig();
+    const apiBase = String(cfg.apiBase || '').replace(/\/+$/, '');
+    const apiKey = String(cfg.apiKey || '');
+
+    return {
+      apiBase,
+      apiKey,
+      model: MODEL,
+      configured: Boolean(apiBase && apiKey),
+      headers: {
+        'Content-Type': 'application/json',
+        ...(apiKey ? { Authorization: 'Bearer ' + apiKey } : {})
+      }
+    };
+  }
+
+  /* =========================================================
+   * 渲染基础工具
+   * =======================================================*/
+  let stick = true; // 是否自动吸底
+
+  stream.addEventListener('scroll', () => {
+    stick = stream.scrollHeight - stream.scrollTop - stream.clientHeight < 40;
+  });
+
+  function scrollToBottom() {
+    if (stick) stream.scrollTop = stream.scrollHeight;
+  }
+
+  function push(el) {
+    stream.appendChild(el);
+    scrollToBottom();
+    return el;
+  }
+
+  function fmt(value) {
+    if (value === null) return 'null';
+    if (value === undefined) return '';
+    if (typeof value === 'string') return value;
+    if (value instanceof Error) return value.message;
+    try {
+      return JSON.stringify(value, null, 2);
+    } catch (e) {
+      return String(value);
+    }
+  }
+
+  /* =========================================================
+   * 3. 对外 API：showMessage()
+   * =======================================================*/
+  /**
+   * 在窗口里展示一条 agent（或 user）消息。
+   * @param {string} text
+   * @param {{role?: 'agent'|'user', pending?: boolean}} [opts]
+   * @returns {{el: HTMLElement, update(t:string):any, append(t:string):any, remove():void}}
+   */
+  function showMessage(text = '', opts = {}) {
+    const el = document.createElement('div');
+    el.className = 'msg ' + (opts.role === 'user' ? 'user' : 'agent');
+    el.textContent = text;
+    if (opts.pending || !text) el.classList.add('pending');
+    push(el);
+
+    const handle = {
+      el,
+      /** 覆盖全部内容 */
+      update(next) {
+        el.classList.remove('pending');
+        el.textContent = next == null ? '' : String(next);
+        scrollToBottom();
+        return handle;
+      },
+      /** 追加内容（适合流式输出） */
+      append(chunk) {
+        el.classList.remove('pending');
+        el.textContent += chunk == null ? '' : String(chunk);
+        scrollToBottom();
+        return handle;
+      },
+      remove() {
+        el.remove();
+        return handle;
+      }
+    };
+
+    return handle;
+  }
+
+  /* =========================================================
+   * 4. 对外 API：showToolCall()
+   * =======================================================*/
+  /**
+   * 在窗口里展示一次工具调用状态。
+   * @param {string} name 工具名
+   * @param {{status?: 'running'|'done'|'error', args?: any, result?: any}} [opts]
+   * @returns {{
+   *   el: HTMLElement,
+   *   setStatus(state: string, label?: string): any,
+   *   setArgs(v:any): any,
+   *   setResult(v:any): any,
+   *   done(result?: any): any,
+   *   fail(error: any): any,
+   *   remove(): any
+   * }}
+   */
+  function showToolCall(name = 'tool', opts = {}) {
+    const el = document.createElement('div');
+    el.className = 'tool running';
+
+    const head = document.createElement('div');
+    head.className = 'tool-head';
+
+    const dot = document.createElement('span');
+    dot.className = 'dot';
+
+    const nameEl = document.createElement('span');
+    nameEl.className = 'tool-name';
+    nameEl.textContent = name;
+
+    const statusEl = document.createElement('span');
+    statusEl.className = 'tool-status';
+
+    head.append(dot, nameEl, statusEl);
+
+    const body = document.createElement('div');
+    body.className = 'tool-body';
+    body.hidden = true;
+
+    el.append(head, body);
+    push(el);
+
+    const startedAt = performance.now();
+    let timer = null;
+
+    const elapsed = () => ((performance.now() - startedAt) / 1000).toFixed(1) + 's';
+    const tick = () => { statusEl.textContent = 'running · ' + elapsed(); };
+
+    function section(label, value) {
+      let sec = body.querySelector('[data-label="' + label + '"]');
+      if (!sec) {
+        sec = document.createElement('div');
+        sec.className = 'tool-sec';
+        sec.dataset.label = label;
+
+        const l = document.createElement('div');
+        l.className = 'tool-label';
+        l.textContent = label;
+
+        const pre = document.createElement('pre');
+        sec.append(l, pre);
+        body.append(sec);
+      }
+      sec.querySelector('pre').textContent = fmt(value);
+      body.hidden = false;
+      scrollToBottom();
+      return sec;
+    }
+
+    function setState(state, label) {
+      el.classList.remove('running', 'done', 'error');
+      el.classList.add(state);
+
+      if (state === 'running') {
+        tick();
+        if (!timer) timer = setInterval(tick, 100);
+      } else {
+        if (timer) { clearInterval(timer); timer = null; }
+        statusEl.textContent = (label || state) + ' · ' + elapsed();
+      }
+      scrollToBottom();
+    }
+
+    const handle = {
+      el,
+      setArgs(v) { section('参数', v); return handle; },
+      setResult(v) { section('结果', v); return handle; },
+      setStatus(state, label) { setState(state, label); return handle; },
+      done(result) {
+        if (result !== undefined) section('结果', result);
+        setState('done', 'done');
+        return handle;
+      },
+      fail(error) {
+        section('错误', error);
+        setState('error', 'error');
+        return handle;
+      },
+      remove() {
+        if (timer) { clearInterval(timer); timer = null; }
+        el.remove();
+        return handle;
+      }
+    };
+
+    // 初始状态
+    if (opts.args !== undefined) handle.setArgs(opts.args);
+    if (opts.result !== undefined) section('结果', opts.result);
+    setState(opts.status || 'running');
+
+    return handle;
+  }
+
+  /* =========================================================
+   * 默认的消息处理（可被覆盖）
+   * =======================================================*/
+  async function defaultUserMessage(text, api) {
+    if (!api.configured) {
+      return '请先点右上角 ⚙ 填写 API Base 和 API Key。';
+    }
+
+    const msg = showMessage('', { pending: true });
+
+    try {
+      const res = await fetch(api.apiBase + '/chat/completions', {
+        method: 'POST',
+        headers: api.headers,
+        body: JSON.stringify({
+          model: api.model,
+          messages: [{ role: 'user', content: text }]
+        })
+      });
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        msg.update('请求失败 (' + res.status + ')：' +
+          ((data && data.error && data.error.message) || res.statusText));
+        return null;
+      }
+
+      const content = data && data.choices && data.choices[0] &&
+                      data.choices[0].message && data.choices[0].message.content;
+
+      msg.update(typeof content === 'string' ? content : JSON.stringify(data, null, 2));
+      return null;
+    } catch (err) {
+      msg.update('请求失败：' + (err && err.message ? err.message : err));
+      return null;
+    }
+  }
+
+  /* =========================================================
+   * 发送流程
+   * =======================================================*/
+  async function send(text) {
+    const t = String(text == null ? '' : text).trim();
+    if (!t) return;
+
+    showMessage(t, { role: 'user' });
+
+    const handler = AgentChat.onUserMessage;
+    if (typeof handler !== 'function') return;
+
+    try {
+      const out = await handler(t, getApiConfig());
+      if (typeof out === 'string' && out.trim()) showMessage(out);
+    } catch (err) {
+      showMessage('⚠ ' + (err && err.message ? err.message : err));
+    }
+  }
+
+  /* =========================================================
+   * 全局 API
+   * =======================================================*/
+  const AgentChat = {
+    /** 展示一条 agent 消息（role: 'user' 可展示用户消息） */
+    showMessage,
+
+    /** 展示 / 更新一次工具调用状态 */
+    showToolCall,
+
+    /** 读取 API 配置（apiBase / apiKey / model / configured / headers） */
+    getApiConfig,
+
+    /** 写入 API 配置并持久化到 localStorage */
+    setApiConfig,
+
+    /** 清空消息区 */
+    clear() {
+      stream.innerHTML = '';
+      stick = true;
+    },
+
+    /** 以用户身份发送一条消息（会先渲染用户气泡，再交给 onUserMessage） */
+    send,
+
+    /**
+     * 用户消息处理器，可被外部覆盖：
+     *   AgentChat.onUserMessage = async (text, api) => { ... }
+     * 返回非空字符串时会自动作为 agent 消息展示。
+     */
+    onUserMessage: defaultUserMessage
+  };
+
+  window.AgentChat = AgentChat;
+
+  /* =========================================================
+   * UI 绑定
+   * =======================================================*/
+  $('#settingsBtn').addEventListener('click', () => {
+    settingsPanel.hidden = !settingsPanel.hidden;
+    if (!settingsPanel.hidden) {
+      const cfg = readRawConfig();
+      apiBaseInput.value = cfg.apiBase || '';
+      apiKeyInput.value = cfg.apiKey || '';
+      apiBaseInput.focus();
+    }
+  });
+
+  $('#saveCfg').addEventListener('click', () => {
+    setApiConfig({ apiBase: apiBaseInput.value, apiKey: apiKeyInput.value });
+    cfgStatus.textContent = '已保存';
+    setTimeout(() => { cfgStatus.textContent = ''; }, 1500);
+  });
+
+  $('#clearCfg').addEventListener('click', () => {
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    apiBaseInput.value = '';
+    apiKeyInput.value = '';
+    cfgStatus.textContent = '已清除';
+    setTimeout(() => { cfgStatus.textContent = ''; }, 1500);
+  });
+
+  function autoGrow() {
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+  }
+  input.addEventListener('input', autoGrow);
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      composer.requestSubmit();
+    }
+  });
+
+  composer.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const text = input.value;
+    if (!text.trim()) return;
+    input.value = '';
+    autoGrow();
+    AgentChat.send(text);
+  });
+
+  /* 初始欢迎消息 */
+  showMessage('你好，我是 Agent。点右上角 ⚙ 配置 API Base 与 API Key 后即可开始。');
+})();
+</script>
+</body>
+</html>
